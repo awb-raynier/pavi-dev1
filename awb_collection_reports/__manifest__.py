@@ -26,5 +26,6 @@
     'depends': ['account_accountant'],
 
     'data': [
+        'views/segmentations.xml',
     ],
 }
