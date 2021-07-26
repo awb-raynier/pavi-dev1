@@ -9,3 +9,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [ADD] Fields for Current, Arrears and Advances
 - [ADD] Computation for Current Arrears and Advances
+- [ADD] Fields for Monthly Service, Device, Security Deposit, and Others on Segmentations field
+- [ADD] Consolidate fees in matched invoices for Segmentations field
