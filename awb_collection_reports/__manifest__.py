@@ -27,5 +27,6 @@
 
     'data': [
         'views/segmentations.xml',
+        'views/account_payment_view.xml',
     ],
 }
