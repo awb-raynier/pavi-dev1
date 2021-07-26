@@ -55,7 +55,7 @@ class AWBSegmentationPayment(models.Model):
 	others = fields.Float()
 
 	segmentation_price = fields.Monetary(related='invoice_line.invoice_amount')
-	segmentation_boolean = fields.Boolean(compute='segmentation_recompute')
+	segmentation_boolean = fields.Boolean()#compute='segmentation_recompute')
 
 	# @api.depends('segmentation_boolean')
 	# def segmentation_recompute(self):
