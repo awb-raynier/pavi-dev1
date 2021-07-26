@@ -7,4 +7,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [13.0.1.0.0] - 2021-07-26
 
-- Initial Version
+- [ADD] Fields for Current, Arrears and Advances
+- [ADD] Computation for Current Arrears and Advances
