@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="invoice_segmentations_form" model="ir.ui.view">
+		<field name="name">acount.move.segmentations.form</field>
+		<field name="model">account.move</field>
+		<field name="inherit_id" ref="account.view_move_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//sheet/notebook/page[3]/group/group[@name='payments_info_group']" position="after">
+				<group string="Segmentations" name="product_segmentation">
+					<!-- <button name="compute_segmentations" string="Compute" class="oe_highlight" type="object"/> -->
+					<!-- <field name="segmentation_price" widget="monetary"/> -->
+					<field name="segmentation_boolean" invisible="True"/>
+					<field name="monthly_service" widget="monetary"/>
+					<field name="device" widget="monetary"/>
+					<field name="security_deposit" widget="monetary"/>
+					<field name="others" widget="monetary"/>
+				</group>
+			</xpath>
+		</field>
+	</record>
+
+	<record id="payment_segmentation_form" model="ir.ui.view">
+		<field name="name">acount.payment.segmentations.form</field>
+		<field name="model">account.payment</field>
+		<field name="inherit_id" ref="account.view_account_payment_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//sheet/notebook/page[@name='invoices']" position="after">
+				<notebook string="Other Info">
+					<page>
+					<group string="Segmentations">
+						<field name="segmentation_boolean" invisible="True"/>
+						<field name="monthly_service" widget="monetary" readonly="1"/>
+						<field name="device" widget="monetary" readonly="1"/>
+						<field name="security_deposit" widget="monetary" readonly="1"/>
+						<field name="others" widget="monetary" readonly="1"/>
+					</group>
+					</page>
+				</notebook>
+			</xpath>
+		</field>
+	</record>
+</odoo>
