@@ -23,7 +23,11 @@
 
     'version': '13.0.1.0.0',
 
-    'depends': ['account_accountant'],
+    'depends': [
+        'account_accountant',
+        'awb_product_segmentation',
+        'awb_payment_allocation',
+    ],
 
     'data': [
         'views/segmentations.xml',
