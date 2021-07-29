@@ -26,6 +26,7 @@
     'depends': [
         'account_accountant',
         'awb_product_segmentation',
+        'awb_payment_allocation',
     ],
 
     'data': [
