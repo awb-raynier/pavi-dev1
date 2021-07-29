@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [13.0.1.7.1] - 2021-07-29
+
+    - [FIX] Confirm Purchase Order Button Show Stopper
+
 ## [13.0.1.7.0] - 2021-07-22
 
     - [FIX] Allow Administrator to Confirm Purchase Order
