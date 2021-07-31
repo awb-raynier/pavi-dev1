@@ -24,7 +24,7 @@ _(indicate client business requirements)_
 - [ ] **Acceptance 2:** Should be able to 2
 - [ ] **Acceptance 3:** Should be able to 3
 
-**Odoo Standard System Functionality**
+**System Functionality**
 _(indicate odoo standard system functionalities that should be added for consideration in development)_
 - [ ] Should be able to 1  
 - [ ] Should be able to 2
@@ -37,7 +37,7 @@ _(indicate odoo standard system functionalities that should be added for conside
 - [ ] **Acceptance 2:** Should be able to 2
 - [ ] **Acceptance 3:** Should be able to 3
 
-**Odoo Standard System Functionality**
+**System Functionality**
 - [ ] Should be able to 1  
 - [ ] Should be able to 2
 - [ ] Should be able to 3
@@ -47,7 +47,7 @@ _(indicate odoo standard system functionalities that should be added for conside
 - [ ] **Acceptance 2:** Should be able to 2
 - [ ] **Acceptance 3:** Should be able to 3
 
-**Odoo Standard System Functionality**
+**System Functionality**
 - [ ] Should be able to 1  
 - [ ] Should be able to 2
 - [ ] Should be able to 3
