@@ -9,7 +9,7 @@
 ## CLIENT ACCEPTANCE
 
 **Preconditions**
-_(indicate prerequisite transactions, data conditions, flows before the functionality requirement is reached)_
+_(indicate prerequisite user stories, transactions, data conditions, flows before the functionality requirement is reached)_
 - Condition 1
 - Condition 2
 
