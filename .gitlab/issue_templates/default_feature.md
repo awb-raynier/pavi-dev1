@@ -32,7 +32,17 @@ _(indicate odoo standard system functionalities that should be added for conside
 - [ ] **Acceptance 2:** Should be able to 2
 - [ ] **Acceptance 3:** Should be able to 3
 
+**Odoo Standard System Functionality**
+- [ ] Should be able to 1  
+- [ ] Should be able to 2
+- [ ] Should be able to 3
+
 **DEV Committed**
 - [ ] **Acceptance 1:** Should be able to 1  
 - [ ] **Acceptance 2:** Should be able to 2
 - [ ] **Acceptance 3:** Should be able to 3
+
+**Odoo Standard System Functionality**
+- [ ] Should be able to 1  
+- [ ] Should be able to 2
+- [ ] Should be able to 3
