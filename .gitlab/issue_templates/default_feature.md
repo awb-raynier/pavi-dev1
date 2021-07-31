@@ -8,9 +8,6 @@
 - <Ticket No.> Description
 - Other Dependencies
 
-## Related To #
-- <Ticket No.> Description
-
 # Definition of Done
 
 ## CLIENT ACCEPTANCE
@@ -35,28 +32,3 @@
 - [ ] **Acceptance 1:** Should be able to 1  
 - [ ] **Acceptance 2:** Should be able to 2
 - [ ] **Acceptance 3:** Should be able to 3
-
-## TASKS
-
-**DevOps Tasks**
-- [ ] Deploy to DEV
-- [ ] Deploy to STAGING
-- [ ] Deploy to PRELIVE
-- [ ] Deploy to PROD
-
-**QA Tasks**
-- [ ] Test Plan
-- [ ] Test Data Preparation
-- [ ] Functional Test
-- [ ] Release Notes
-
-**DEV Tasks**
-- [ ] Design / Document
-- [ ] Develop
-- [ ] Unit Test
-- [ ] Integration Test
-
-**FC Tasks**
-- [ ] Design / Document
-- [ ] Configure
-- [ ] Test
