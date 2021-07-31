@@ -25,7 +25,7 @@ _(indicate client business requirements)_
 - [ ] **Acceptance 3:** Should be able to 3
 
 **System Functionality**
-_(indicate odoo standard system functionalities that should be added for consideration in development)_
+_(indicate odoo standard or system functionalities that should be added and are recommended for consideration in development)_
 - [ ] Should be able to 1  
 - [ ] Should be able to 2
 - [ ] Should be able to 3
