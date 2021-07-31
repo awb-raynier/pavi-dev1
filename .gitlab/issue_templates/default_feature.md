@@ -1,17 +1,17 @@
 # Definition of Ready
 
-## Wireframes/Screenshots
+**Wireframes/Screenshots**
 
 <TBD>
-
-# Definition of Done
-
-## CLIENT ACCEPTANCE
 
 **Preconditions**
 _(indicate prerequisite user stories, transactions, data conditions, flows before the functionality requirement is reached)_
 - Condition 1
 - Condition 2
+
+# Definition of Done
+
+## CLIENT ACCEPTANCE
 
 **Acceptance Criteria**
 _(indicate client business requirements)_
