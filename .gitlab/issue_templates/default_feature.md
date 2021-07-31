@@ -4,10 +4,6 @@
 
 <TBD>
 
-## Depends On
-- <Ticket No.> Description
-- Other Dependencies
-
 # Definition of Done
 
 ## CLIENT ACCEPTANCE
