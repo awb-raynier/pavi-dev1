@@ -4,14 +4,19 @@
 
 <TBD>
 
-**Preconditions**
-_(indicate prerequisite user stories, transactions, data conditions, flows before the functionality requirement is reached)_
-- Condition 1
-- Condition 2
+**Depends On**
+_(indicate prerequisite user stories, for other related tickets use linked issues below this ticket)_
+- Ticket # 1
+- Ticket # 2
 
 # Definition of Done
 
 ## CLIENT ACCEPTANCE
+
+**Preconditions**
+_(indicate prerequisite user stories, transactions, data conditions, flows before the functionality requirement is reached)_
+- Condition 1
+- Condition 2
 
 **Acceptance Criteria**
 _(indicate client business requirements)_
