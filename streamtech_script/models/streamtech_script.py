@@ -3,6 +3,7 @@ from odoo import api, fields, models, exceptions, _
 from odoo.tools.misc import xlwt
 from simple_salesforce import Salesforce
 from simple_salesforce import format_soql
+import json
 import logging
 import io
 import base64
@@ -46,7 +47,7 @@ class StreamtechScript(models.Model):
         product_names = products.mapped("name")
 
         records = []
-        step = 500
+        step = 250
 
         for i in range(0, len(product_names), step):
 
@@ -73,9 +74,10 @@ class StreamtechScript(models.Model):
                 product_name = record.get("Name")
                 odoo_rec = products.filtered_domain([
                     ("name", "=ilike", product_name)
-                ])[0]
+                ])
 
                 if odoo_rec:
+                    odoo_rec = odoo_rec[0]
                     row_data.append(odoo_rec.id)
                     odoo_rec.write({"salesforce_id": sf_id})
                 else:
@@ -87,9 +89,8 @@ class StreamtechScript(models.Model):
 
         if records:
             headers = ["Odoo ID"]
-            raw_headers = dict(results['records'][0])
-            raw_headers.pop("attributes")
-            headers = headers + list(raw_headers.keys())
+            raw_headers = record.keys()
+            headers = headers + list(raw_headers)
 
             filename = "Sync_Product_SFID(%s).xlsx" % datetime.today().strftime(
                 '%Y-%m-%d %H:%M:%S'
@@ -144,9 +145,10 @@ class StreamtechScript(models.Model):
                 sf_cust_number = record.get("Billing_Customer_ID__c")
                 odoo_rec = odoo_records.filtered_domain([
                     ("customer_number", "=", sf_cust_number)
-                ])[0]
+                ])
 
                 if odoo_rec:
+                    odoo_rec = odoo_rec[0]
                     row_data.append(odoo_rec.id)
                     odoo_rec.write({"salesforce_id": sf_id})
                 else:
@@ -158,9 +160,8 @@ class StreamtechScript(models.Model):
 
         if records:
             headers = ["Odoo ID"]
-            raw_headers = dict(results['records'][0])
-            raw_headers.pop("attributes")
-            headers = headers + list(raw_headers.keys())
+            raw_headers = record.keys()
+            headers = headers + list(raw_headers)
 
             filename = "Sync_Account_SFID(%s).xlsx" % datetime.today().strftime(
                 '%Y-%m-%d %H:%M:%S'
@@ -209,13 +210,16 @@ class StreamtechScript(models.Model):
                 row_data = []
                 record = dict(record)
                 record.pop("attributes")
+                record["Account"].pop("attributes")
+                record = json.loads(json.dumps(record))  # To remove the OrderedDict
                 sf_id = record.get("Id")
                 sf_cust_number = record.get("Account").get("Billing_Customer_ID__c")
                 odoo_rec = odoo_records.filtered_domain([
                     ("customer_number", "=", sf_cust_number)
-                ])[0]
+                ])
 
                 if odoo_rec:
+                    odoo_rec = odoo_rec[0]
                     row_data.append(odoo_rec.id)
                     odoo_rec.write({"salesforce_id": sf_id})
                 else:
@@ -227,9 +231,8 @@ class StreamtechScript(models.Model):
 
         if records:
             headers = ["Odoo ID"]
-            raw_headers = dict(results['records'][0])
-            raw_headers.pop("attributes")
-            headers = headers + list(raw_headers.keys())
+            raw_headers = record.keys()
+            headers = headers + list(raw_headers)
 
             filename = "Sync_Opportunity_SFID(%s).xlsx" % datetime.today().strftime(
                 '%Y-%m-%d %H:%M:%S'
@@ -262,6 +265,8 @@ class StreamtechScript(models.Model):
         for record in records:
             y += 1
             for x, item in enumerate(record):
+                if isinstance(item, dict):
+                    item = list(item.values())[0]
                 sheet.write(y, x, item)
 
         workbook.save(stream)
