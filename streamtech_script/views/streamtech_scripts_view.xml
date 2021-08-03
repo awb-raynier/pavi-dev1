@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+	<!-- window action -->
+	<record model="ir.actions.act_window" id="template_view_report_action">
+	    <field name="name">Data Migration Reports</field>
+	    <field name="type">ir.actions.act_window</field>
+	    <field name="res_model">streamtech.data.report</field>
+	    <field name="view_mode">tree,form</field>
+	</record>
+
+	<record model="ir.ui.view" id="excel_report_tree_view">
+		<field name="name">streamtech.data.report.tree</field>
+		<field name="model">streamtech.data.report</field>
+		<field name="arch" type="xml">
+			<tree string="Data Migration Report Tree">
+				<field name="file_name" />
+				<field name="excel_file" readonly="1" filename="file_name"/>
+			</tree>
+		</field>
+	</record>
+
+	<record model="ir.ui.view" id="template_excel_action_form_view">
+		<field name="name">streamtech.data.report.form</field>
+		<field name="model">streamtech.data.report</field>
+		<field name="arch" type="xml">
+			<form string="Data Migration Report Form">
+				<sheet>
+					<group colspan="12">
+						<field name="file_name" invisible="1" />
+					</group>
+					<group col="12">
+						<group colspan="12">
+							<field name="excel_file" readonly="1" filename="file_name"/>
+						</group>
+					</group>
+				</sheet>
+			</form>
+		</field>
+	</record>
+
+</odoo>
