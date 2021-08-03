@@ -15,39 +15,39 @@ class AccountPayment(models.Model):
 
     @api.depends('invoice_ids.amount_total', 'amount')
     def _compute_current(self):
-        args = [
-            ('id','in', self.invoice_ids.ids),
-            ('type','=','out_invoice'),
-            ('invoice_payment_state','=','paid'),
-            ('state','=','posted'),
-            ('invoice_date_due', '>=', self.payment_date)
-        ]
         for record in self:
-            paid_invoices = self.env['account.move'].search(args)
+            args = [
+                ('id','in', record.invoice_ids.ids),
+                ('type','=','out_invoice'),
+                ('invoice_payment_state','=','paid'),
+                ('state','=','posted'),
+                ('invoice_date_due', '>=', record.payment_date)
+            ]
+            paid_invoices = record.env['account.move'].search(args)
             if record.payment_date:
-                record.current = sum(s.amount_total for s in paid_invoices)
+                record.current = sum(paid_invoices.mapped('amount_total'))
 
     @api.depends('invoice_ids.amount_total', 'amount')
     def _compute_arrears(self):
-        args = [
-            ('id','in', self.invoice_ids.ids),
-            ('type','=','out_invoice'),
-            ('state','=','posted'),
-            ('invoice_date_due', '<', self.payment_date)
-        ]
         for record in self:
-            paid_invoices = self.env['account.move'].search(args)
+            args = [
+                ('id','in', record.invoice_ids.ids),
+                ('type','=','out_invoice'),
+                ('state','=','posted'),
+                ('invoice_date_due', '<', record.payment_date)
+            ]
+            paid_invoices = record.env['account.move'].search(args)
             if record.payment_date:
-                record.arrears = sum(s.amount_total for s in paid_invoices)
+                record.arrears = sum(paid_invoices.mapped('amount_total'))
 
     @api.depends('invoice_ids.amount_residual', 'amount')
     def _compute_advances(self):
-        args = [
-            ('id','in', self.invoice_ids.ids),
-            ('type','=','out_invoice'),
-            ('state','=','posted'),
-        ]
         for record in self:
-            paid_invoices = self.env['account.move'].search(args)
+            args = [
+                ('id','in', record.invoice_ids.ids),
+                ('type','=','out_invoice'),
+                ('state','=','posted'),
+            ]    
+            paid_invoices = record.env['account.move'].search(args)
             if record.payment_date:
-                record.advances = record.amount - sum(s.amount_residual for s in paid_invoices)
+                record.advances = record.amount - sum(paid_invoices.mapped('amount_residual'))

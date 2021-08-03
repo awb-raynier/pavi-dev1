@@ -1,14 +1,10 @@
-# Definition of Ready
-
-## Depends On
-- <Ticket No.> Description
-- Other Dependencies
-
-## Related To #
-- <Ticket No.> Description
-
 # Definition of Done
 
+### Preconditions
+- Condition 1
+- Condition 2
+
+### Acceptance Criteria
 - [ ] Task 1
 - [ ] Task 2
 - [ ] Task 3
