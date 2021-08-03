@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [13.0.1.1.1] - 2021-08-04
    - [IMP] Added logs and updated warnings for no active products found and pulling of accounts without opportunities
    - [IMP] Added handling for multiple records found in Odoo via salesforce_id
+   - [IMP] Enhancement: Remove the SF Connector Condition to limit the pull of Opportunities based on Created Date
 
 ## [13.0.1.1.0] - 2021-07-29
    - [IMP] Salesforce Connector Enhancement for Pulling of Products, Accounts and Opportunities
