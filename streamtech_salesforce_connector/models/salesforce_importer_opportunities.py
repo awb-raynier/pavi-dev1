@@ -91,9 +91,8 @@ class SalesForceImporterOpportunities(models.Model):
                         opportunity.OpportunityLineItems),
                     {account_query}
                 FROM opportunity
-                WHERE CreatedDate >= """ + self._DATE_START + """
-                AND ((StageName = 'Closed Won' AND Sub_Stages__c in ('Completed Activation'))
-                OR StageName = 'Closed Lost')
+                WHERE ((StageName = 'Closed Won' AND Sub_Stages__c in ('Completed Activation'))
+                OR StageName = 'Closed Lost') 
                 AND Opportunity_In_Effect__c = True 
                 AND Account.IsDeleted = False 
                 AND Account.Active_Disconnected__c = 'Active'
