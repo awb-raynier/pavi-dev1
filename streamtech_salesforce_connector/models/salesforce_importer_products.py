@@ -2,7 +2,6 @@ import logging
 import datetime
 
 from odoo import models, _
-
 from openerp.osv import osv
 from odoo.exceptions import ValidationError
 
