@@ -38,14 +38,14 @@ class StreamtechScript(models.Model):
             _logger.info(" --- SF Login Failed --- ")
             Warning(_(str(e)))
 
-    def _sync_product_sfid(self):
-        _logger.info(" --- Product SF ID sync starting --- ")
-        sf = self.connect_to_salesforce()
+    def _sync_product_sfid(self, odoo_records=None):
+        if not odoo_records:
+            raise exceptions.UserError("Odoo Records are required")
 
-        products = self.env['product.template'].search([
-            ("salesforce_id", "=", False),
-        ], limit=5000)
-        product_names = products.mapped("name")
+        sf = self.connect_to_salesforce()
+        _logger.info(" --- Product SF ID sync starting --- ")
+
+        product_names = odoo_records.mapped("name")
 
         records = []
         step = 250
@@ -80,7 +80,7 @@ class StreamtechScript(models.Model):
                 record.pop("attributes")
                 sf_id = record.get("Id")
                 product_name = record.get("Name")
-                odoo_rec = products.filtered_domain([
+                odoo_rec = odoo_records.filtered_domain([
                     ("name", "=ilike", product_name)
                 ])
 
@@ -123,14 +123,13 @@ class StreamtechScript(models.Model):
                 sheet="Product Sync SFID"
             )
 
-    def _sync_account_sfid(self):
-        _logger.info(" --- Account SF ID sync starting --- ")
-        sf = self.connect_to_salesforce()
+    def _sync_account_sfid(self, odoo_records=None):
+        if not odoo_records:
+            raise exceptions.UserError("Odoo Records are required")
 
-        odoo_records = self.env['res.partner'].search([
-            ("salesforce_id", "=", False),
-            ("customer_number", "!=", False),
-        ], limit=5000)
+        sf = self.connect_to_salesforce()
+        _logger.info(" --- Account SF ID sync starting --- ")
+
         cnumbers = odoo_records.mapped("customer_number")
 
         records = []
@@ -208,14 +207,13 @@ class StreamtechScript(models.Model):
                 sheet="Account Sync SFID"
             )
 
-    def _sync_opportunity_sfid(self):
-        _logger.info(" --- Opportunity SF ID sync starting --- ")
-        sf = self.connect_to_salesforce()
+    def _sync_opportunity_sfid(self, odoo_records=None):
+        if not odoo_records:
+            raise exceptions.UserError("Odoo Records are required")
 
-        odoo_records = self.env['crm.lead'].search([
-            ("salesforce_id", "=", False),
-            ("customer_number", "!=", False),
-        ], limit=5000)
+        sf = self.connect_to_salesforce()
+        _logger.info(" --- Opportunity SF ID sync starting --- ")
+
         cnumbers = odoo_records.mapped("customer_number")
 
         records = []
