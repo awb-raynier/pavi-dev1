@@ -6,3 +6,4 @@
 
 ## [13.0.0.0.1]
    - [IMP] Added additional details on xls reports
+   - [IMP] odoo query on sched actions
