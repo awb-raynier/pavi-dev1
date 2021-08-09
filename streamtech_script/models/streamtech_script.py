@@ -35,16 +35,17 @@ class StreamtechScript(models.Model):
             )
             return self.sales_force
         except Exception as e:
+            _logger.info(" --- SF Login Failed --- ")
             Warning(_(str(e)))
 
-    def _sync_product_sfid(self):
-        _logger.info(" --- Product SF ID sync starting --- ")
-        sf = self.connect_to_salesforce()
+    def _sync_product_sfid(self, odoo_records=None):
+        if not odoo_records:
+            raise exceptions.UserError("Odoo Records are required")
 
-        products = self.env['product.template'].search([
-            ("salesforce_id", "=", False),
-        ], limit=5000)
-        product_names = products.mapped("name")
+        sf = self.connect_to_salesforce()
+        _logger.info(" --- Product SF ID sync starting --- ")
+
+        product_names = odoo_records.mapped("name")
 
         records = []
         step = 250
@@ -56,7 +57,14 @@ class StreamtechScript(models.Model):
                 """
                     SELECT
                     Id,
-                    Name
+                    Name,
+                    ProductCode,
+                    IsActive,
+                    Family,
+                    Type__c,
+                    Facility_Type__c,
+                    CreatedDate,
+                    LastModifiedDate
                     FROM Product2 as product
                     WHERE product.Id != null
                     AND product.Name IN {products}
@@ -72,14 +80,22 @@ class StreamtechScript(models.Model):
                 record.pop("attributes")
                 sf_id = record.get("Id")
                 product_name = record.get("Name")
-                odoo_rec = products.filtered_domain([
+                odoo_rec = odoo_records.filtered_domain([
                     ("name", "=ilike", product_name)
                 ])
 
                 if odoo_rec:
                     odoo_rec = odoo_rec[0]
-                    row_data.append(odoo_rec.id)
                     odoo_rec.write({"salesforce_id": sf_id})
+
+                    # Data Report Creation
+                    row_data.append(odoo_rec.id)
+                    row_data.append(odoo_rec.salesforce_id)
+                    row_data.append(odoo_rec.default_code)
+                    row_data.append(odoo_rec.recurring_invoice)
+                    row_data.append(odoo_rec.subscription_template_id.display_name)
+                    row_data.append(odoo_rec.active)
+                    row_data.append(odoo_rec.categ_id.display_name)
                 else:
                     row_data.append("None")
                 row_data = row_data + list(record.values())
@@ -88,7 +104,11 @@ class StreamtechScript(models.Model):
         _logger.info(" --- Product SF ID sync execution done --- ")
 
         if records:
-            headers = ["Odoo ID"]
+            headers = [
+                "ID (Odoo)", "Salesforce ID (Odoo)", "Product Code (Odoo)",
+                "Subscription Product (Odoo)", "Subscription Template (Odoo)",
+                "Active (Odoo)", "Product Category (Odoo)",
+            ]
             raw_headers = record.keys()
             headers = headers + list(raw_headers)
 
@@ -103,14 +123,13 @@ class StreamtechScript(models.Model):
                 sheet="Product Sync SFID"
             )
 
-    def _sync_account_sfid(self):
-        _logger.info(" --- Account SF ID sync starting --- ")
-        sf = self.connect_to_salesforce()
+    def _sync_account_sfid(self, odoo_records=None):
+        if not odoo_records:
+            raise exceptions.UserError("Odoo Records are required")
 
-        odoo_records = self.env['res.partner'].search([
-            ("salesforce_id", "=", False),
-            ("customer_number", "!=", False),
-        ], limit=5000)
+        sf = self.connect_to_salesforce()
+        _logger.info(" --- Account SF ID sync starting --- ")
+
         cnumbers = odoo_records.mapped("customer_number")
 
         records = []
@@ -124,10 +143,12 @@ class StreamtechScript(models.Model):
                     SELECT
                     Id,
                     Name,
-                    FirstName,
-                    MiddleName,
-                    LastName,
-                    Billing_Customer_ID__c
+                    Billing_Customer_ID__c,
+                    ATM_Ref__c,
+                    PersonEmail,
+                    PersonMobilePhone,
+                    CreatedDate,
+                    LastModifiedDate
                     FROM Account as rec
                     WHERE rec.Id != null
                     AND rec.Billing_Customer_ID__c IN {cnumbers}
@@ -149,8 +170,15 @@ class StreamtechScript(models.Model):
 
                 if odoo_rec:
                     odoo_rec = odoo_rec[0]
-                    row_data.append(odoo_rec.id)
                     odoo_rec.write({"salesforce_id": sf_id})
+
+                    row_data.append(odoo_rec.id)
+                    row_data.append(odoo_rec.salesforce_id)
+                    row_data.append(odoo_rec.display_name)
+                    row_data.append(odoo_rec.customer_number)
+                    row_data.append(odoo_rec.email)
+                    row_data.append(odoo_rec.mobile)
+                    row_data.append(odoo_rec.subscriber_location_id.display_name)
                 else:
                     row_data.append("None")
                 row_data = row_data + list(record.values())
@@ -159,7 +187,12 @@ class StreamtechScript(models.Model):
         _logger.info(" --- Account SF ID sync execution done --- ")
 
         if records:
-            headers = ["Odoo ID"]
+            headers = [
+                "ID (Odoo)", "Salesforce ID (Odoo)",
+                "Name (Odoo)", "Customer ID (Odoo)",
+                "Email (Odoo)", "Mobile (Odoo)",
+                "Location (Odoo)",
+            ]
             raw_headers = record.keys()
             headers = headers + list(raw_headers)
 
@@ -174,14 +207,13 @@ class StreamtechScript(models.Model):
                 sheet="Account Sync SFID"
             )
 
-    def _sync_opportunity_sfid(self):
-        _logger.info(" --- Opportunity SF ID sync starting --- ")
-        sf = self.connect_to_salesforce()
+    def _sync_opportunity_sfid(self, odoo_records=None):
+        if not odoo_records:
+            raise exceptions.UserError("Odoo Records are required")
 
-        odoo_records = self.env['crm.lead'].search([
-            ("salesforce_id", "=", False),
-            ("customer_number", "!=", False),
-        ], limit=5000)
+        sf = self.connect_to_salesforce()
+        _logger.info(" --- Opportunity SF ID sync starting --- ")
+
         cnumbers = odoo_records.mapped("customer_number")
 
         records = []
@@ -194,8 +226,15 @@ class StreamtechScript(models.Model):
                 """
                     SELECT
                     Id,
+                    Opportunity_Number__c,
+                    Type,
                     Name,
-                    Account.Billing_Customer_ID__c
+                    Area_ODOO__c,
+                    StageName,
+                    Sub_Stages__c,
+                    Account.Billing_Customer_ID__c,
+                    CreatedDate,
+                    LastModifiedDate
                     FROM opportunity as opp
                     WHERE opp.Id != null
                     AND opp.AccountId != null
@@ -220,8 +259,18 @@ class StreamtechScript(models.Model):
 
                 if odoo_rec:
                     odoo_rec = odoo_rec[0]
-                    row_data.append(odoo_rec.id)
                     odoo_rec.write({"salesforce_id": sf_id})
+
+                    row_data.append(odoo_rec.id)
+                    row_data.append(odoo_rec.salesforce_id)
+                    row_data.append(odoo_rec.opportunity_number)
+                    row_data.append(odoo_rec.sf_type)
+                    row_data.append(odoo_rec.display_name)
+                    row_data.append(odoo_rec.zone.display_name)
+                    row_data.append(odoo_rec.stage_id.display_name)
+                    row_data.append(odoo_rec.job_order_status)
+                    row_data.append(odoo_rec.customer_number)
+
                 else:
                     row_data.append("None")
                 row_data = row_data + list(record.values())
@@ -230,7 +279,13 @@ class StreamtechScript(models.Model):
         _logger.info(" --- Opportunity SF ID sync execution done --- ")
 
         if records:
-            headers = ["Odoo ID"]
+            headers = [
+                "ID (Odoo)", "Salesforce ID (Odoo)",
+                "SF Opportunity Number (Odoo)",
+                "Type (Odoo)", "Name (Odoo)",
+                "Zone (Odoo)", "Stage (Odoo)",
+                "Job Order Status (Odoo)", "Customer ID (Odoo)",
+            ]
             raw_headers = record.keys()
             headers = headers + list(raw_headers)
 
