@@ -29,7 +29,8 @@ class SalesForceImporterProducts(models.Model):
             # Added handling of multiple searched products
             if len(odoo_product) > 1:
                 _logger.debug(f'Multiple Products found in Odoo with SF Id: {product["Id"]}')
-                odoo_product = self.env['product.template'].search(domain, limit=1)
+                odoo_product = self.env['product.template'].search([('salesforce_id', '=', product['Id']),
+                      ('active', '=', True)], limit=1)
 
             all_category = self.env['product.category'].search([('name', '=', 'All')])
             if product['Family']:

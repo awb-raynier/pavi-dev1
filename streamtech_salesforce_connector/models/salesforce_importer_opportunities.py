@@ -289,7 +289,8 @@ class SalesForceImporterOpportunities(models.Model):
             # Added handling of multiple searched products
             if len(odoo_product) > 1:
                 _logger.debug(f'Multiple Products found in Odoo with SF Id: {product["Product2Id"]}')
-                odoo_product = self.env['product.template'].search(domain, limit=1)
+                odoo_product = self.env['product.template'].search([('salesforce_id', '=', product['Product2Id']),
+                      ('active', '=', True)], limit=1)
             if not odoo_product:
                 _logger.debug(f'Import Product: {product}')
                 self.import_products(False, product['Product2Id'], True)
@@ -297,7 +298,8 @@ class SalesForceImporterOpportunities(models.Model):
                 # Added handling of multiple searched products
                 if len(odoo_product) > 1:
                     _logger.debug(f'Multiple Products found in Odoo with SF Id: {product["Product2Id"]}')
-                    odoo_product = self.env['product.template'].search([('salesforce_id', '=', product['Product2Id'])], limit=1)
+                    odoo_product = self.env['product.template'].search([('salesforce_id', '=', product['Product2Id']), 
+                        ('active', '=', True)], limit=1)
 
             total_cash_out = product['Total_Cash_Out__c']
             if product['Device_Fee__c'] and product['Device_Fee__c'] > 0:
@@ -380,6 +382,13 @@ class SalesForceImporterOpportunities(models.Model):
             if len(odoo_lead) > 1:
                 _logger.debug(f'Multiple Leads found in Odoo with SF Id: {lead["Id"]}')
                 odoo_lead = self.env['crm.lead'].search([('salesforce_id', '=', lead['Id'])], limit=1)
+            
+            # Added handling if found lead in Odoo already have Completed stage. 
+            # Ignore temporarily until identified what to do.
+            if odoo_lead.stage_id.id == completed_stage.id:
+                _logger.debug(f'Lead found has already Completed Stage with SF Id: {lead["Id"]}')
+                continue
+
             if odoo_lead:
                 if lead['CampaignId']:
                     campaign = self.env['utm.campaign'].search([('salesforce_id', '=', lead['CampaignId'])])
