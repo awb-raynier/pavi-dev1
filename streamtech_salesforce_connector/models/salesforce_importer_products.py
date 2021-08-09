@@ -2,28 +2,36 @@ import logging
 import datetime
 
 from odoo import models, _
-from openerp import _
 from openerp.osv import osv
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
+no_active_product_msg = _('No active Product records found for import in SF.')
 
 
 class SalesForceImporterProducts(models.Model):
     _inherit = 'salesforce.connector'
 
     def creating_products(self, products):
-        _logger.info(f'Creating Products {len(products)}')
+        _logger.info('-------------------- STREAMTECH creating_products start')
+        _logger.info(f'Creating Products: {len(products)}')
         salesforce_ids = []
         for idx, product in enumerate(products):
             _logger.debug(f'Processing Products: {idx} out of {len(products)}')
 
             if not product['Family'] or not product.get('Type__c') or not product.get('Facility_Type__c'): 
-                _logger.info(f'Products without Category: {product["Id"]}')
+                _logger.debug(f'This Product does not have category: {product["Id"]}')
                 continue
 
             domain = [('salesforce_id', '=', product['Id']),
                       ('active', 'in', (True, False))]
             odoo_product = self.env['product.template'].search(domain)
+            # Added handling of multiple searched products
+            if len(odoo_product) > 1:
+                _logger.debug(f'Multiple Products found in Odoo with SF Id: {product["Id"]}')
+                odoo_product = self.env['product.template'].search([('salesforce_id', '=', product['Id']),
+                      ('active', '=', True)], limit=1)
+
             all_category = self.env['product.category'].search([('name', '=', 'All')])
             if product['Family']:
                 category_name = product['Family']
@@ -99,11 +107,12 @@ class SalesForceImporterProducts(models.Model):
             salesforce_ids.append(product['Id'])
 
         _logger.info(f'Completed Creating Products {len(products)}')
+        _logger.info('-------------------- STREAMTECH creating_products end')
         return salesforce_ids
 
     def import_products(self, Auto, id=None, fromOpportunity=False):
-        _logger.info('----------------- STREAMTECH import_products')
-        _logger.info(f'Import Products {Auto}')
+        _logger.info('-------------------- STREAMTECH import_products start')
+        _logger.info(f'Import Products: {Auto}')
         query = "SELECT Id, Name, ProductCode, Description" \
                 ", Family, IsActive, Type__c, Facility_Type__c, Bandwidth__c" \
                 ", Monthly_Subscription_Fee__c " \
@@ -134,11 +143,12 @@ class SalesForceImporterProducts(models.Model):
             query += from_date_query + to_date_query
 
         query += " LIMIT 5000"
-        _logger.info(f'Query {query}')
+        _logger.info(f'Query: {query}')
         # products = self.sales_force.query(query)['records']
         products = self.sales_force.bulk.Product2.query(query)
 
         if not products and not fromOpportunity:
-            raise osv.except_osv(_("Sync Details!"), _("No active product records found."))
+            raise ValidationError(no_active_product_msg)
 
+        _logger.info('-------------------- STREAMTECH import_products end')
         return self.creating_products(products)

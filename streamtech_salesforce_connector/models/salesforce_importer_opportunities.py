@@ -15,7 +15,7 @@ class SalesForceImporterOpportunities(models.Model):
     _DATE_START = '2021-05-11T00:00:00+0000'
 
     def import_opportunities(self, Auto, customer_sf_ids=[]):
-        _logger.info('----------------- STREAMTECH import_opportunities')
+        _logger.info('-------------------- STREAMTECH import_opportunities start')
         if not self.sales_force:
             self.connect_to_salesforce()
 
@@ -91,9 +91,8 @@ class SalesForceImporterOpportunities(models.Model):
                         opportunity.OpportunityLineItems),
                     {account_query}
                 FROM opportunity
-                WHERE CreatedDate >= """ + self._DATE_START + """
-                AND ((StageName = 'Closed Won' AND Sub_Stages__c in ('Completed Activation'))
-                OR StageName = 'Closed Lost')
+                WHERE ((StageName = 'Closed Won' AND Sub_Stages__c in ('Completed Activation'))
+                OR StageName = 'Closed Lost') 
                 AND Opportunity_In_Effect__c = True 
                 AND Account.IsDeleted = False 
                 AND Account.Active_Disconnected__c = 'Active'
@@ -126,6 +125,7 @@ class SalesForceImporterOpportunities(models.Model):
 
         query += " LIMIT 1000 "
         opportunities = self.sales_force.bulk.Opportunity.query(query)
+        _logger.info('-------------------- STREAMTECH import_opportunities end')
         return self.creating_opportunities(opportunities, customer_sf_ids)
 
         # except Exception as e:
@@ -133,6 +133,7 @@ class SalesForceImporterOpportunities(models.Model):
         #     raise osv.except_osv("Error Details!", e)
 
     def _create_lead_data(self, lead, lead_stage, campaign, medium, source):
+        _logger.info('-------------------- STREAMTECH _create_lead_data start')
         substage = lead.get('Sub_Stages__c', '')
         if substage == '':
             substage = 'new'
@@ -273,9 +274,11 @@ class SalesForceImporterOpportunities(models.Model):
         if lead['sf_type'] == 'Reconnect ion':
             lead['sf_type'] = 'Reconnection'
 
+        _logger.info('-------------------- STREAMTECH _create_lead_data end')
         return lead
 
     def _create_lead_product_data(self, opportunity, products):
+        _logger.info('-------------------- STREAMTECH _create_lead_product_data start')
         items = []
         _logger.debug(f'Adding Products {len(products)}')
         device_fee = 0
@@ -283,10 +286,20 @@ class SalesForceImporterOpportunities(models.Model):
             domain = [('salesforce_id', '=', product['Product2Id']),
                       ('active', 'in', (True, False))]
             odoo_product = self.env['product.template'].search(domain)
+            # Added handling of multiple searched products
+            if len(odoo_product) > 1:
+                _logger.debug(f'Multiple Products found in Odoo with SF Id: {product["Product2Id"]}')
+                odoo_product = self.env['product.template'].search([('salesforce_id', '=', product['Product2Id']),
+                      ('active', '=', True)], limit=1)
             if not odoo_product:
                 _logger.debug(f'Import Product: {product}')
                 self.import_products(False, product['Product2Id'], True)
                 odoo_product = self.env['product.template'].search([('salesforce_id', '=', product['Product2Id'])])
+                # Added handling of multiple searched products
+                if len(odoo_product) > 1:
+                    _logger.debug(f'Multiple Products found in Odoo with SF Id: {product["Product2Id"]}')
+                    odoo_product = self.env['product.template'].search([('salesforce_id', '=', product['Product2Id']), 
+                        ('active', '=', True)], limit=1)
 
             total_cash_out = product['Total_Cash_Out__c']
             if product['Device_Fee__c'] and product['Device_Fee__c'] > 0:
@@ -316,24 +329,39 @@ class SalesForceImporterOpportunities(models.Model):
         _logger.debug(f'Adding Items {len(items)}')
         if len(items):
             opportunity.update({'product_lines': items})
+        
+        _logger.info('-------------------- STREAMTECH _create_lead_product_data end')
 
     def _get_partner_data(self, lead, customer_sf_ids):
+        _logger.info('-------------------- STREAMTECH _get_partner_data start')
         lead_partner = self.env['res.partner'].search([('salesforce_id', '=', lead['AccountId'])])
+        # Added handling of multiple searched leads
+        if len(lead_partner) > 1:
+            _logger.debug(f'Multiple Accounts found in Odoo with SF Id: {lead["AccountId"]}')
+            lead_partner = self.env['res.partner'].search([('salesforce_id', '=', lead['AccountId'])], limit=1)
         partner = lead['Account']
         zone = self._find_zone(lead['Area_ODOO__c'])
         lead_partner = self._create_customer(partner, lead_partner, zone, customer_sf_ids)
 
+        _logger.info('-------------------- STREAMTECH _get_partner_data end')
         return lead_partner
 
     def _find_sales_team(self, sales_team):
+        _logger.info('-------------------- STREAMTECH _find_sales_team start')
         team = self.env['crm.team'].search([('name', '=ilike', sales_team)], limit=1)
+
+        _logger.info('-------------------- STREAMTECH _find_sales_team end')
         return team
 
     def _find_zone(self, zone):
+        _logger.info('-------------------- STREAMTECH _find_zone start')
         zone = self.env['subscriber.location'].search([('name', '=', zone)], limit=1)
+
+        _logger.info('-------------------- STREAMTECH _find_zone end')
         return zone
 
     def creating_opportunities(self, opportunities, customer_sf_ids):
+        _logger.info('-------------------- STREAMTECH creating_opportunities start')
         salesforce_ids = []
         campaign = None
         medium = None
@@ -350,6 +378,17 @@ class SalesForceImporterOpportunities(models.Model):
                 products = []
 
             odoo_lead = self.env['crm.lead'].search([('salesforce_id', '=', lead['Id'])])
+            # Added handling of multiple searched leads
+            if len(odoo_lead) > 1:
+                _logger.debug(f'Multiple Leads found in Odoo with SF Id: {lead["Id"]}')
+                odoo_lead = self.env['crm.lead'].search([('salesforce_id', '=', lead['Id'])], limit=1)
+            
+            # Added handling if found lead in Odoo already have Completed stage. 
+            # Ignore temporarily until identified what to do.
+            if odoo_lead.stage_id.id == completed_stage.id:
+                _logger.debug(f'Lead found has already Completed Stage with SF Id: {lead["Id"]}')
+                continue
+
             if odoo_lead:
                 if lead['CampaignId']:
                     campaign = self.env['utm.campaign'].search([('salesforce_id', '=', lead['CampaignId'])])
@@ -451,4 +490,5 @@ class SalesForceImporterOpportunities(models.Model):
             _logger.info(f'STREAMTECH creating_opportunities Lead: {idx} of {len(opportunities)} ----------------- ')
             salesforce_ids.append(lead['Id'])
 
+        _logger.info('-------------------- STREAMTECH creating_opportunities end')
         return salesforce_ids
