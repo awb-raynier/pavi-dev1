@@ -92,6 +92,7 @@ class SalesForceImporterOpportunities(models.Model):
                     {account_query}
                 FROM opportunity
                 WHERE ((StageName = 'Closed Won' AND Sub_Stages__c in ('Completed Activation'))
+
                 OR StageName = 'Closed Lost') 
                 AND Opportunity_In_Effect__c = True 
                 AND Account.IsDeleted = False 
