@@ -35,6 +35,7 @@
                             <field name="currency" />
                             <field name="min_amount" widget="monetary" options="{'currency_field': 'currency'}"/>
                             <field name="max_amount" widget="monetary" options="{'currency_field': 'currency'}"/>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                         </group>
                     </group>
 

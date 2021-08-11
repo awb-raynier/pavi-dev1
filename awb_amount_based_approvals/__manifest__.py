@@ -27,6 +27,7 @@
 
     'data': [
         'security/ir.model.access.csv',
+        'security/ir.rule.csv',
         'views/approval_rules_view.xml',
         'views/approval_types_view.xml',
         'views/approval_request_view.xml',

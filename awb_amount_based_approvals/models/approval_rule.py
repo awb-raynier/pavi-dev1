@@ -15,12 +15,13 @@ class ApprovalRule(models.Model):
     max_amount = fields.Float('Maximum Amount', required=True, tracking=True)
     active = fields.Boolean('Active', index=True, default=True, tracking=True)
     approval_type = fields.Selection([('amount', 'Amount'),('none','None')], string='Approval Type', default='amount', tracking=True)
-    department = fields.Many2one('hr.department', String='Department')
+    department = fields.Many2one('hr.department', String='Department', domain="[('company_id', '=', company_id)]")
 
     manager_id = fields.Boolean('Manager', default=False, tracking=True)
     operation_head_id = fields.Boolean('Operations Head', default=False, tracking=True)
 
     approver_ids = fields.One2many('approval.rule.line','approval_id', String='Approvers')
+    company_id = fields.Many2one('res.company', 'Company', index=True, default=lambda self: self.env.company)
 
     @api.depends('min_amount', 'max_amount')
     def _compute_name(self):
