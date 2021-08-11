@@ -18,7 +18,12 @@
     'depends': ['account'],
     'data': [
         'security/ir.model.access.csv',
+        'views/account_payment_template.xml',
         'views/account_payment_view.xml',
+        'views/payment_allocation_view.xml',
+    ],
+    'qweb': [
+        "static/src/xml/account_reconciliation_view.xml",
     ],
     'installable': True,
     'application': False,

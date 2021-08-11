@@ -97,6 +97,8 @@ class PaymentAllocationLine(models.Model):
     def _compute_reconcile(self):
         for rec in self:
             full_reconcile = False
-            if round(rec.invoice_amount, 2) == rec.paid_amount:
+            if round(rec.invoice_amount, 2) == rec.paid_amount or round(rec.invoice_amount, 2) == 0:
                 full_reconcile = True
+            else:
+                full_reconcile = False
             rec.full_reconcile = full_reconcile
