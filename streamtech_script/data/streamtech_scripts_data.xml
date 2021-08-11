@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Scheduled actions -->
+    <record id="streamtech_data_migration_product_sched_action" model="ir.cron">
+      <field name="name">[SYNC] Product SFID</field>
+      <field name="active">False</field>
+      <field name="user_id" ref="base.user_root"/>
+      <field name="model_id" ref="model_streamtech_scripts"></field>
+      <field name="type">ir.actions.server</field>
+      <field name="state">code</field>
+      <field name="code">
+odoo_records = env['product.template'].search([
+  ("salesforce_id", "=", False),
+], limit=5000)
+model._sync_product_sfid(odoo_records)
+      </field>
+      <field name="interval_number">5</field>
+      <field name="interval_type">minutes</field>
+      <field name="numbercall">0</field>
+    </record>
+
+    <record id="streamtech_data_migration_account_sched_action" model="ir.cron">
+      <field name="name">[SYNC] Account SFID</field>
+      <field name="active">False</field>
+      <field name="user_id" ref="base.user_root"/>
+      <field name="model_id" ref="model_streamtech_scripts"></field>
+      <field name="type">ir.actions.server</field>
+      <field name="state">code</field>
+      <field name="code">
+odoo_records = env['res.partner'].search([
+  ("salesforce_id", "=", False),
+  ("customer_number", "!=", False),
+], limit=5000)
+model._sync_account_sfid(odoo_records)
+      </field>
+      <field name="interval_number">5</field>
+      <field name="interval_type">minutes</field>
+      <field name="numbercall">0</field>
+    </record>
+
+    <record id="streamtech_data_migration_opportunity_sched_action" model="ir.cron">
+      <field name="name">[SYNC] Opportunity SFID</field>
+      <field name="active">False</field>
+      <field name="user_id" ref="base.user_root"/>
+      <field name="model_id" ref="model_streamtech_scripts"></field>
+      <field name="type">ir.actions.server</field>
+      <field name="state">code</field>
+      <field name="code">
+odoo_records = env['crm.lead'].search([
+  ("salesforce_id", "=", False),
+  ("customer_number", "!=", False),
+], limit=5000)
+model._sync_opportunity_sfid(odoo_records)
+      </field>
+      <field name="interval_number">5</field>
+      <field name="interval_type">minutes</field>
+      <field name="numbercall">0</field>
+    </record>
+</odoo>

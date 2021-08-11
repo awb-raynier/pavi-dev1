@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <menuitem id="main_report_menu" name="Data Migration" web_icon="streamtech_script,static/description/data_migration_icon.png" />
+
+    <menuitem id="view_report" name="Reports" parent="main_report_menu" />
+    <menuitem id="submenu_view_report" name="View Reports" parent="view_report" action="template_view_report_action"/>
+
+</odoo>
