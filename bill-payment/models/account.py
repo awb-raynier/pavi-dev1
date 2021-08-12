@@ -166,6 +166,7 @@ class AccountMove(models.Model):
         self.update({'statement_line_ids': lines})
 
 
+
 class account_payment(models.Model):
     _inherit = "account.payment"
 
