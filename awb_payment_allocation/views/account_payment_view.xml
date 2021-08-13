@@ -20,8 +20,8 @@
                             <field name="invoice"/>
                             <field name="invoice_date"/>
                             <field name="due_date"/>
+                            <field name="invoice_total" string="Invoice Amount"/>
                             <field name="invoice_amount" string="Amount Due"/>
-                            <field name="invoice_total" string="Invoice Amount" invisible="1"/>
                             <field name="currency_id"/>
                             <field name="full_reconcile"/>
                             <field name="paid_amount"/>

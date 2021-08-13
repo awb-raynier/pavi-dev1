@@ -11,6 +11,7 @@ var relational_fields = require('web.relational_fields');
 var basic_fields = require('web.basic_fields');
 var core = require('web.core');
 var time = require('web.time');
+var rpc = require('web.rpc');
 var session = require('web.session');
 var qweb = core.qweb;
 var _t = core._t;
@@ -70,18 +71,18 @@ var _t = core._t;
 		// 	return Promise.all([def1, def2]);
 		// },
 
-		/**
-		 * @private
-		 * @param {MouseEvent} event
-		 */
-		_onSelectMoveLine: function (event) {
-			var $el = $(event.target);
-			$el.prop('disabled', true);
-			this._destroyPopover($el);
-			var moveLineId = $el.closest('.mv_line').data('line-id');
-			console.log("TEST 4444", moveLineId);
-			this.trigger_up('add_proposition', {'data': moveLineId});
-		},
+		// /**
+		//  * @private
+		//  * @param {MouseEvent} event
+		//  */
+		// _onSelectMoveLine: function (event) {
+		// 	var $el = $(event.target);
+		// 	$el.prop('disabled', true);
+		// 	this._destroyPopover($el);
+		// 	var moveLineId = $el.closest('.mv_line').data('line-id');
+		// 	console.log("TEST 4444", moveLineId);
+		// 	this.trigger_up('add_proposition', {'data': moveLineId});
+		// },
 
 		/**
 	 * update the statement line rendering
@@ -146,15 +147,58 @@ var _t = core._t;
 			var $mv_lines = this.$('div[id*="notebook_page_' + matching_modes[i] + '"] .match table tbody').empty();
 			this.$('.o_notebook li a[href*="notebook_page_' + matching_modes[i] + '"]').parent().toggleClass('d-none', stateMvLines.length === 0 && !state['filter_'+matching_modes[i]]);
 
-			// console.log("TEST 5555", stateMvLines[i].name)
-			// var this_mv_line = stateMvLines[i].name
-			if (stateMvLines.length != 0) {
-				var mv_line_id = stateMvLines[i].id
-				console.log("TEST 5555", stateMvLines[i].name)
-				console.log("TEST 6666", stateMvLines.length)
-				console.log("TEST 7777", matching_modes.length)
-				this.trigger_up('add_proposition', {'data': mv_line_id});
-			}
+			// var id_dict = [];
+			// if (stateMvLines.length != 0) {
+			var payment_id = self.model.context.active_id;
+			var allocation_mode = self.get_payment_allocation_mode(payment_id);
+			var payment_alloc = Promise.all([allocation_mode]).then((paresults) => {
+				var pr = paresults[0]
+				if (pr == 'old_invoice' && stateMvLines.length != 0){
+					// var date_sort = stateMvLines.slice().sort((a, b) => b.id - a.id);
+					var date_sort = stateMvLines.slice().sort(function(a,b) {
+						var a = a.date_maturity
+						var b = b.date_maturity
+						a = a.split('/').reverse().join('');
+						b = b.split('/').reverse().join('');
+						return a > b ? 1 : a < b ? -1 : 0;
+						// return a.localeCompare(b); // <-- alternative 
+						});
+					var mv_line_id = date_sort[i].id;
+					// id_dict.push(mv_line_id);
+					console.log("TEST 5555", stateMvLines[i].name)
+					console.log("TEST 6666", stateMvLines.length)
+					console.log("TEST 7777", stateMvLines[i].date_maturity)
+					console.log("move line id array", date_sort)
+					console.log("TEST 1010")
+					this.trigger_up('add_proposition', {'data': mv_line_id});
+					
+				}else if (pr == 'high_amount' && stateMvLines.length != 0){
+					console.log("TEST 5555", stateMvLines[i].name)
+					console.log("TEST 6666", stateMvLines.length)
+					console.log("TEST 7777", stateMvLines[i].date_maturity)
+					console.log("move line id array", date_sort)
+					console.log("TEST 1010")
+					var high_amount_sort_debit = stateMvLines.slice().sort((a, b) => b.debit - a.debit);
+					var high_amount_sort_credit = stateMvLines.slice().sort((a, b) => b.credit - a.credit);
+					if (high_amount_sort_debit.credit == 0) {
+						var mv_line_id2 = high_amount_sort_debit[i].id;
+						this.trigger_up('add_proposition', {'data': mv_line_id2});
+					} else if (high_amount_sort_credit.debit == 0) {
+						var mv_line_id3 = high_amount_sort_credit[i].id;
+						this.trigger_up('add_proposition', {'data': mv_line_id3});
+					}
+				}else if (pr == 'low_amount' && stateMvLines.length != 0) {
+					this.trigger_up('add_proposition', {'data': mv_line_id});
+				}else if (pr == 'manual' && stateMvLines.length != 0) {
+					this.trigger_up('add_proposition', {'data': mv_line_id});
+				}
+			});
+
+				// var invoice_date = self.get_payment_allocation_date(payment_id);
+				// var invoice_date_payment = Promise.all([allocation_mode]).then((idpresults) => {
+				// 	var id = idpresults[0]
+				// 	console.log("TEST", id)
+				// });
 
 			_.each(stateMvLines, function (line) {
 				var $line = $(qweb.render("reconciliation.line.mv_line", {'line': line, 'state': state}));
@@ -236,6 +280,50 @@ var _t = core._t;
 		}
 		this.$('.create .add_line').toggle(!!state.balance.amount_currency);
 		},
+
+		get_payment_allocation_mode: function(payment_id){
+			var model = 'account.payment';
+			var domain = [];
+			var fields = ['id','allocation_mode'];
+			var allocation_mode = '';
+
+			return rpc.query({
+				model: model,
+				method: 'search_read',
+				args: [domain, fields],
+			}).then(function(data){
+				for(var i in data){
+					if(data[i].id == payment_id){
+						allocation_mode = data[i].allocation_mode;
+						// break;
+					};
+				};
+				return allocation_mode;
+			});
+
+		},
+
+		// get_payment_allocation_date: function(payment_id){
+		// 	var model = 'account.payment';
+		// 	var domain = [];
+		// 	var fields = ['id','invoice_date_due'];
+		// 	var invoice_date = '';
+
+		// 	return rpc.query({
+		// 		model: model,
+		// 		method: 'search_read',
+		// 		args: [domain, fields],
+		// 	}).then(function(data){
+		// 		for(var i in data){
+		// 			if(data[i].id == payment_id){
+		// 				invoice_date = data[i].invoice_date_due;
+		// 				// break;
+		// 			};
+		// 		};
+		// 		return invoice_date;
+		// 	});
+
+		// },
 
 	})
 		
