@@ -126,9 +126,9 @@ class SaleSubscription(models.Model):
             }
         return res
 
-    def _total_number_of_days_in_month(date):
-        Total_number_days = (date.replace(month = date.month % 12 +1, day = 1)-datetime.timedelta(days=1)).day
-        return Total_number_days
+    # def _total_number_of_days_in_month(date):
+    #     Total_number_days = (date.replace(month = date.month % 12 +1, day = 1)-datetime.timedelta(days=1)).day
+    #     return Total_number_days
 
     def _prepare_invoice_line(self, line, fiscal_position, date_start=False, date_stop=False):
         now = datetime.datetime.now()
