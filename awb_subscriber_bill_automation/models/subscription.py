@@ -8,6 +8,7 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
+import datetime
 
 import logging
 
@@ -124,6 +125,10 @@ class SaleSubscription(models.Model):
             }
         return res
 
+    def _total_number_of_days_in_month(date):
+        Total_number_days = (date.replace(month = date.month % 12 +1, day = 1)-datetime.timedelta(days=1)).day
+        return Total_number_days
+
     def _prepare_invoice_line(self, line, fiscal_position, date_start=False, date_stop=False):
         res = super(SaleSubscription, self)._prepare_invoice_line(
             line, fiscal_position, date_start, date_stop)
@@ -149,11 +154,11 @@ class SaleSubscription(models.Model):
             elif not line.date_start and subs_date_start > date_start:
                 diff = date_end - subs_date_start
 
-            month_factor = 31
+            # month_factor = 31
             if diff:
                 days = diff.days
             else:
-                days = month_factor
+                days = _total_number_of_days_in_month(datetime.datetime.now()) # month_factor
 
             count = 0
             if days < month_factor:
