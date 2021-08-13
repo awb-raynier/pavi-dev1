@@ -50,7 +50,7 @@ class AccountMove(models.Model):
                 ('type', '=', 'out_invoice'),
                 ('state', '=', 'posted'),
                 ('is_subscription', '=', True),
-                ('invoice_date', '<=', self.invoice_date),
+                ('posting_date', '<=', self.posting_date),
                 ('invoice_date_due', '<', self.invoice_date_due),
                 ('id', '!=', self.id)]
         invoice_id = self.env['account.move'].search(args, limit=1, order="invoice_date_due desc")
