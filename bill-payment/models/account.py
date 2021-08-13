@@ -75,6 +75,7 @@ class AccountMove(models.Model):
                 ('type', '=', 'out_invoice'),
                 ('state', '=', 'posted'),
                 ('is_subscription', '=', True),
+                ('amount_residual_signed','!=','0'),
                 ('posting_date', '<=', start_date_cutoff)]
         bill_balance = self.env['account.move'].search(bill_args, order="invoice_date_due desc")
         _logger.debug(f' Previous bill {bill_balance}')
