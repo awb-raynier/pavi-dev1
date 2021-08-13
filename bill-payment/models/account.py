@@ -92,7 +92,7 @@ class AccountMove(models.Model):
         payment_args = [('partner_id', '=', self.partner_id.id),
                 ('state', '=', 'posted'),
                 ('x_studio_payment_for_receipts','=', False),
-                ('payment_date','<', end_date_cutoff)]
+                ('payment_date','<=', end_date_cutoff)]
         bill_payment = self.env['account.payment'].search(payment_args, order="payment_date desc")
         _logger.debug(f' Previous Payment: {bill_payment}')
 
