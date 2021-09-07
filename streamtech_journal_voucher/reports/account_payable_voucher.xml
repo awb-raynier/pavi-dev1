@@ -34,7 +34,6 @@
                             <div class="col-8 text-left">
                                 <b>Payee: </b><u><span t-field="doc.partner_id"/></u>
                             </div>
-                            </div>
                             <div class="col-4 text-right">
                                 <b>Date: </b> <u><span t-field="doc.date" t-options='{"widget": "date", "format": "MMMM dd, yyyy"}'/></u>
                             </div>
