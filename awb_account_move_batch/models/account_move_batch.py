@@ -53,7 +53,7 @@ class AccountMoveBatch(models.Model):
     name = fields.Char(string='Sequence', readonly=True, default="MASS INV/", required=True)
     invoice_type = fields.Selection([('cust_invoice', 'Customer Invoice')],
                                     string="Invoice Type", default='cust_invoice')
-    company_id = fields.Many2one('res.company', string='Company', default=_get_company_default, readonly=True, copy=False, required=True,)
+    company_id = fields.Many2one('res.company', string='Company', default=_get_company_default, copy=False, required=True,)
     rebate_date = fields.Date(string="Date", required=True, default=fields.Date.today())
     journal_id = fields.Many2one('account.journal', string='Journal', required=True, default=_default_journal, 
                                  domain="['|', ('company_id', '=', False), ('company_id', '=', company_id), ('type', '=', 'sale')]")
