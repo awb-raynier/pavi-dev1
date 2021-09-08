@@ -29,7 +29,7 @@
                   <group>
                     <field name="rebate_date" attrs="{'readonly':[('state','!=','draft')]}"/>
                     <field name="journal_id" attrs="{'readonly':[('state','!=','draft')]}" />
-                    <field name="company_id"/>
+                    <field name="company_id" attrs="{'readonly':[('state','!=','draft')]}" />
                   </group>
                   <notebook colspan="4">
                     <page string="Invoice Lines">
