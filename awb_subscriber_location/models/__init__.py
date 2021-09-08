@@ -11,3 +11,5 @@ from . import partner
 from . import project
 from . import sale_subscription
 from . import subscriber_location
+from . import penetration_rate
+from . import active_subscribers

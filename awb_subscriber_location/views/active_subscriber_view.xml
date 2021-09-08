@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+	<record id="subscription_stage_custom_form" model="ir.ui.view">
+		<field name="name">subscription.stage.custom.form</field>
+		<field name="model">sale.subscription.stage</field>
+		<field name="inherit_id" ref="sale_subscription.sale_subscription_stage_view_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//sheet/group/group[2]/field[@name='in_progress']" position="after">
+				<field name="closed"/>
+			</xpath>
+		</field>
+	</record>
+
+
+</odoo>

@@ -33,6 +33,8 @@
         'views/project_view.xml',
         'views/sale_subscription_view.xml',
         'views/sale_view.xml',
+        'views/penetration_rate_view.xml',
+        'views/active_subscriber_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

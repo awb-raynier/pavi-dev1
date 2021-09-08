@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+	<record id="view_project_move_in_tree" model="ir.ui.view">
+		<field name="name">view.project.move.in.tree</field>
+		<field name="model">project.move.in</field>
+		<field name="arch" type="xml">
+			<tree string="Move In" editable="bottom">
+				<field name="date"/>
+				<field name="move_in" sum="Total Move In"/>
+			</tree>
+		</field>
+	</record>
+
+	<record id="move_in_form" model="ir.ui.view">
+		<field name="name">project.project.custom.form</field>
+		<field name="model">project.project</field>
+		<field name="inherit_id" ref="project.edit_project"/>
+		<field name="arch" type="xml">
+			<xpath expr="//sheet/div/button[2]" position="after">
+				<button class="oe_stat_button" string="Move In" name="move_in_button" type="object" icon="fa-file-text-o"/>
+			</xpath>
+			<xpath expr="//group[@name='extra_settings']/field[@name='brand']" position="after">
+				<field name="house_pass_number" required="True"/>
+				<field name="move_in_number" />
+				<field name="move_in_lines" invisible="1"/>
+			</xpath>
+		</field>
+	</record>
+
+	<record id="subscriber_location_custom_form" model="ir.ui.view">
+		<field name="name">subscriber.location.custom.form</field>
+		<field name="model">subscriber.location</field>
+		<field name="inherit_id" ref="awb_subscriber_location.subscriber_location_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//sheet/group" position="inside">
+				<group string="Project">
+					<field name="house_pass" string="Number of House Pass"/>
+					<field name="move_in" string="Number of Move In"/>
+				</group>
+				<group string="Subscribers">
+					<field name="active_count" string="Active"/>
+					<field name="disconnected_count" string="Disconnected"/>
+					<field name="total_count" string="Total"/>
+				</group>
+			</xpath>
+		</field>
+	</record>
+
+</odoo>
